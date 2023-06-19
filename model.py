@@ -19,31 +19,6 @@ n_layers = 2
 dropout = 0.2
 vocab_size = 94
 
-torch.manual_seed(12345)
-with open('wikisent2.txt', 'r', encoding='utf-8') as f:
-    text = f.read()
-
-# chars = sorted(list(set(text)))
-# vocab_size = len(chars)
-# stoi = {i:ch for i,ch in enumerate(chars)}
-# itos = {ch:i for i,ch in enumerate(chars)}
-# encode = lambda s: [stoi[c] for c in s]           # string --> int
-# decode = lambda l: ''.join([itos[i] for i in l])  # int --? string
-
-#data = torch.tensor(encode(text), dtype=torch.long, device=device)
-# n = int(0.9 * len(data))
-# train_data = data[:n]
-# val_data = data[n:]
-
-# # data loading
-# def get_batch(split):
-#     data = train_data if split == 'train' else val_data
-#     ix = torch.randint(len(data) - block_size, (batch_size,), device=device)
-#     x = torch.stack([data[i:i+block_size] for i in ix])
-#     y = torch.stack([data[i+1:i+block_size+1] for i in ix])
-#     x, y = x.to(device), y.to(device)
-#     return x, y
-
 class MultiHeadAttention(nn.Module):
     def __init__(self, n_heads, head_size):
         super().__init__()
@@ -151,34 +126,8 @@ class GPTModel(nn.Module):
             idx = torch.cat((idx, idx_next), dim=1)
         return idx
     
-# @torch.no_grad()
-# def estimate_loss():
-#     out = {}
-#     model.eval()
-#     for split in ['train', 'val']:
-#         losses = torch.zeros(eval_iters)
-#         for k in range(eval_iters):
-#             X,Y = get_batch(split)
-#             logits, loss = model(X,Y)
-#             losses[k] = loss.item()
-#         out[split] = losses.mean()
-#     model.train()
-#     return out
-
 model = GPTModel()
 model = model.to(device)
 model.load_state_dict(torch.load('model_weights.pth'))
-# print(sum(p.nelement() for p in model.parameters()))
-
-# optimizer = optim.AdamW(model.parameters(), lr=learning_rate)
-# for iter in range(max_iters):
-#     if iter % eval_interval == 0 or iter == max_iters - 1:
-#         losses = estimate_loss()
-#         print(f"Step: {iter}    | train loss: {losses['train']:.4f}     | val loss: {losses['val']:.4f}")
-#         xb, yb = get_batch('train')
-#         logits, loss =model(xb, yb)
-#         optimizer.zero_grad(set_to_none=True)
-#         loss.backward()
-#         optimizer.step()
 
 # torch.save(model.save_dict(), os.path.join('model_weights.pth'))
